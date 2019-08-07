@@ -6,7 +6,8 @@
     "sourceMap": true,
     "target": "es6",
     "outDir": "./dist",
-    "baseUrl": "./lib"
+    "baseUrl": "./lib",
+    "watch": true
   },
   "include": ["lib/**/*.ts"],
   "exclude": ["node_modules"]

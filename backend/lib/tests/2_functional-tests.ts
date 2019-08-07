@@ -13,9 +13,9 @@ import server from '../server';
 
 chaiModule.use(chaiHttp);
 
-suite('Functional Tests', () => {
-  suite('GET /api/stock-prices => stockData object', () => {
-    test('1 stock', done => {
+suite('Functional Tests', function() {
+  suite('GET /api/stock-prices => stockData object', function() {
+    test('1 stock', function(done) {
       chaiModule
         .request(server)
         .get('/api/stock-prices')

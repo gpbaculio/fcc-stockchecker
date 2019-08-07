@@ -11,6 +11,7 @@ require('dotenv').config();
 // tests
 
 import FccTestingRoute from './routes/FccTestingRoute';
+import StockCheckerRoute from './routes/StockCheckerRoute';
 
 interface sessionConfigType {
   secret: string;
@@ -22,7 +23,8 @@ interface sessionConfigType {
 
 class App {
   public app: express.Application = express();
-  public fccTestingRoute: FccTestingRoute = new FccTestingRoute();
+  private fccTestingRoute: FccTestingRoute = new FccTestingRoute();
+  private stockCheckerRoute: StockCheckerRoute = new StockCheckerRoute();
   private mongoSetup = (): void => {
     (<any>mongoose).Promise = global.Promise;
     mongoose.connect(process.env.MONGO_DB_URL, {
@@ -45,23 +47,22 @@ class App {
       resave: true,
       saveUninitialized: true
     };
+
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: true }));
 
-    if (process.env.NODE_ENV === 'production') {
-      this.app.set('trust proxy', 1); // trust first proxy
-      sessionConfig.cookie.secure = true; // serve secure cookies
-    }
+    this.app.set('trust proxy', 1); // trust first proxy
+    sessionConfig.cookie.secure = true; // serve secure cookies
 
     this.app.use(session(sessionConfig));
-    this.app.use(express.static(path.join(__dirname, '../../frontend/build')));
-    // Handle React routing, return all requests to React app
-    this.app.get('/*', (_req, res) => {
-      res.sendFile(path.join(__dirname, '../../frontend/build', 'index.html'));
-    });
+    // this.app.use(express.static(path.join(__dirname, '../../frontend/build')));
+    // // Handle React routing, return all requests to React app
+    // this.app.get('/*', (_req, res) => {
+    //   res.sendFile(path.join(__dirname, '../../frontend/build', 'index.html'));
+    // });
 
     this.fccTestingRoute.routes(this.app);
-
+    this.stockCheckerRoute.routes(this.app);
     //404 Not Found Middleware
     this.app.use((req, res, next) => {
       res

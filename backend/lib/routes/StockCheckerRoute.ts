@@ -12,10 +12,10 @@ import StockCheckerController from '../controllers/StockCheckerController';
 
 export default class StockCheckerRoute {
   private stockCheckerController: StockCheckerController = new StockCheckerController();
-  public routes(app): void {
+  public routes = (app): void => {
     app
-      .route('/api/stock-prices/:stock')
-      .get(this.stockCheckerController.getIssues);
+      .route('/api/stock-prices')
+      .get(this.stockCheckerController.getStockData);
     // .post(this.issueController.create)
     // .put(this.issueController.update)
     // .delete(this.issueController.delete);
@@ -26,5 +26,5 @@ export default class StockCheckerRoute {
     // app
     //   .route('/api/issues/:project_name/:issue_id')
     //   .delete(this.issueController.delete);
-  }
+  };
 }
