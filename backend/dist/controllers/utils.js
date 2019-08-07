@@ -18,10 +18,39 @@ exports.getStockPrice = (symbol) => __awaiter(this, void 0, void 0, function* ()
             apikey: process.env.STOCK_API_KEY
         }
     })
-        .then(({ 'Global Quote': globalQuote }) => globalQuote['05. price']);
+        .then(({ data: { 'Global Quote': globalQuote } }) => {
+        console.log('globalQuote ', globalQuote['05. price']);
+        return globalQuote['05. price'];
+    });
+    console.log('stockPrice ', stockPrice);
     return {
         stock: symbol,
         price: stockPrice
     };
+});
+exports.getStockInfo = (symbol) => __awaiter(this, void 0, void 0, function* () {
+    const getCircularReplacer = () => {
+        const seen = new WeakSet();
+        return (_key, value) => {
+            if (typeof value === 'object' && value !== null) {
+                if (seen.has(value)) {
+                    return;
+                }
+                seen.add(value);
+            }
+            return value;
+        };
+    };
+    const stockInfo = yield axios
+        .get(process.env.STOCK_API_BASE_URL_QUERY, {
+        params: {
+            function: 'TIME_SERIES_INTRADAY',
+            symbol,
+            interval: '60min',
+            apikey: process.env.STOCK_API_KEY
+        }
+    })
+        .then(({ data }) => JSON.stringify(data, getCircularReplacer()));
+    return stockInfo;
 });
 //# sourceMappingURL=utils.js.map

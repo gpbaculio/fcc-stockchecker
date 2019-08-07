@@ -5,7 +5,13 @@ const VoterSchema = new mongoose.Schema({
     voterIp: {
         type: String,
         required: true
-    }
+    },
+    stocksLiked: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Stock'
+        }
+    ]
 }, {
     timestamps: true,
     versionKey: false
