@@ -1,10 +1,3 @@
-/*
- *
- *
- *       Complete the handler logic below
- *
- *
- */
 import { Request, Response } from 'express';
 import Stock, { StockDocument } from '../models/Stock';
 
