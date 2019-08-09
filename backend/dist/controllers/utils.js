@@ -47,10 +47,11 @@ exports.getStockInfo = (symbol) => __awaiter(this, void 0, void 0, function* () 
             function: 'TIME_SERIES_INTRADAY',
             symbol,
             interval: '60min',
+            outputsize: 'full',
             apikey: process.env.STOCK_API_KEY
         }
     })
-        .then(({ data }) => JSON.stringify(data, getCircularReplacer()));
+        .then(({ data }) => JSON.parse(JSON.stringify(data, getCircularReplacer())));
     return stockInfo;
 });
 //# sourceMappingURL=utils.js.map

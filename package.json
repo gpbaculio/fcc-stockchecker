@@ -4,7 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "concurrently --kill-others \"npm run backend\" \"npm run frontend\"",
+    "start": "cd backend && npm start",
+    "backend": "cd backend && npm run dev",
+    "backend-build": "cd backend && npm run build",
+    "frontend": "cd frontend && npm start",
+    "heroku-postbuild": "cd backend && npm install && cd ../frontend && npm install && npm run relay && npm run build"
   },
   "keywords": [],
   "author": "",

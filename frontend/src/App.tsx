@@ -1,26 +1,45 @@
-import React from 'react';
+import React, { Component } from 'react';
+import axios from 'axios';
 import logo from './logo.svg';
 import './App.css';
+import * as d3 from 'd3';
+import Header from './components/Header';
 
-const App: React.FC = () => {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  state = {
+    metaData: {},
+    timeSeries: {}
+  };
+  componentDidMount = async () => {
+    const { data } = await axios.get('/api/stock-info?stock=goog');
+    this.setState(
+      {
+        metaData: data['Meta Data'],
+        timeSeries: data['Time Series (60min)']
+      },
+      this.createChart
+    );
+  };
+  createChart = () => {
+    const width = 900,
+      height = 600;
+    const { timeSeries } = this.state;
+    const times = Object.keys(timeSeries).map(tk => new Date(tk));
+    console.log('times ', times);
+    const svg = d3
+      .select('.svg-container')
+      .append('svg')
+      .attr('width', width)
+      .attr('height', height);
+  };
+  render() {
+    return (
+      <div className='App'>
+        <Header />
+        <div className='svg-container' />
+      </div>
+    );
+  }
 }
 
 export default App;
