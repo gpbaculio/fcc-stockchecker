@@ -46,8 +46,7 @@ exports.getStockInfo = (symbol) => __awaiter(this, void 0, void 0, function* () 
         params: {
             function: 'TIME_SERIES_INTRADAY',
             symbol,
-            interval: '60min',
-            outputsize: 'full',
+            interval: '5min',
             apikey: process.env.STOCK_API_KEY
         }
     })

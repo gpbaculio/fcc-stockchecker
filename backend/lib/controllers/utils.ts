@@ -38,8 +38,7 @@ export const getStockInfo = async (symbol: string) => {
       params: {
         function: 'TIME_SERIES_INTRADAY',
         symbol,
-        interval: '60min',
-        outputsize: 'full',
+        interval: '5min',
         apikey: process.env.STOCK_API_KEY
       }
     })
