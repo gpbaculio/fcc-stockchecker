@@ -25,3 +25,71 @@ header {
   background: #0e3040;
   color: #67809f;
 }
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
+
+path {
+  stroke: steelblue;
+  stroke-width: 2;
+  fill: none;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: grey;
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
+.circle {
+  fill: white;
+  stroke: steelblue;
+  stroke-width: 1px;
+}
+
+.area {
+  fill: steelblue;
+  stroke: none;
+  opacity: 0.1;
+}
+
+.zeroline {
+  fill: none;
+  stroke: red;
+  stroke-width: 0.5px;
+  stroke-dasharray: 5 5;
+}
+
+.zerolinetext {
+  fill: red;
+}
+
+.overlay {
+  fill: none;
+  stroke: none;
+  pointer-events: all;
+}
+
+.focusLine {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 0.5px;
+}
+
+.focusCircle {
+  fill: red;
+}
