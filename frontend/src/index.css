@@ -28,13 +28,13 @@ header {
 
 .line {
   fill: none;
-  stroke: steelblue;
-  stroke-width: 2px;
+  stroke: #006400;
+  stroke-width: 2;
 }
 
 
 path {
-  stroke: steelblue;
+  stroke: #006400;
   stroke-width: 2;
   fill: none;
 }
@@ -51,18 +51,18 @@ path {
 
 .line {
   fill: none;
-  stroke: steelblue;
+  stroke: #006400;
   stroke-width: 2px;
 }
 
 .circle {
   fill: white;
-  stroke: steelblue;
+  stroke: #006400;
   stroke-width: 1px;
 }
 
 .area {
-  fill: steelblue;
+  fill: #006400;
   stroke: none;
   opacity: 0.1;
 }
@@ -86,10 +86,20 @@ path {
 
 .focusLine {
   fill: none;
-  stroke: steelblue;
+  stroke: #006400;
   stroke-width: 0.5px;
 }
 
 .focusCircle {
-  fill: red;
+  fill: #006400;
+}
+
+.grid .tick {
+  stroke: lightgrey;
+  stroke-opacity: 0.5;
+  shape-rendering: crispEdges;
+}
+
+.grid path {
+  stroke-width: 0;
 }
