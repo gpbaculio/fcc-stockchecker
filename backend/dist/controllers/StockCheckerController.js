@@ -23,6 +23,13 @@ class ProjectController {
             const stockInfo = yield utils_1.getStockInfo(stock);
             res.json(stockInfo);
         });
+        this.getSymbol = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { keywords } = req.query;
+            console.log('keywords ', keywords);
+            const matches = yield utils_1.searchSymbol(keywords);
+            console.log('matches', matches);
+            res.json({ matches });
+        });
     }
 }
 exports.default = ProjectController;

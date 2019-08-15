@@ -53,4 +53,14 @@ exports.getStockInfo = (symbol) => __awaiter(this, void 0, void 0, function* () 
         .then(({ data }) => JSON.parse(JSON.stringify(data, getCircularReplacer())));
     return stockInfo;
 });
+exports.searchSymbol = (symbol) => __awaiter(this, void 0, void 0, function* () {
+    const { data: { bestMatches } } = yield axios.get(process.env.STOCK_API_BASE_URL_QUERY, {
+        params: {
+            function: 'SYMBOL_SEARCH',
+            keywords: symbol,
+            apikey: process.env.STOCK_API_KEY
+        }
+    });
+    return bestMatches;
+});
 //# sourceMappingURL=utils.js.map

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Input } from 'reactstrap';
 import './App.css';
 import * as d3 from 'd3';
-import Header from './components/Header';
+import { Header, SearchInput } from './components';
 
 interface tsData {
   '1. open': string;
@@ -242,7 +242,7 @@ class App extends Component<{}, AppState> {
     return (
       <div className='App'>
         <Header />
-        <Input />
+        <SearchInput />
         <div className='svg-container' />
       </div>
     );

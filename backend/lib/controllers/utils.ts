@@ -47,3 +47,16 @@ export const getStockInfo = async (symbol: string) => {
     );
   return stockInfo;
 };
+
+export const searchSymbol = async (symbol: string) => {
+  const {
+    data: { bestMatches }
+  } = await axios.get(process.env.STOCK_API_BASE_URL_QUERY, {
+    params: {
+      function: 'SYMBOL_SEARCH',
+      keywords: symbol,
+      apikey: process.env.STOCK_API_KEY
+    }
+  });
+  return bestMatches;
+};

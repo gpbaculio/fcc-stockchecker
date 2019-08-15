@@ -17,5 +17,6 @@ export default class StockCheckerRoute {
       .route('/api/stock-prices')
       .get(this.stockCheckerController.getStockData);
     app.route('/api/stock-info').get(this.stockCheckerController.getStockInfo);
+    app.route('/api/search-symbol').get(this.stockCheckerController.getSymbol);
   };
 }
