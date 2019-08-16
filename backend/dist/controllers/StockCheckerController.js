@@ -25,9 +25,7 @@ class ProjectController {
         });
         this.getSymbol = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { keywords } = req.query;
-            console.log('keywords ', keywords);
             const matches = yield utils_1.searchSymbol(keywords);
-            console.log('matches', matches);
             res.json({ matches });
         });
     }

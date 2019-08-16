@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Input } from 'reactstrap';
+import { Input, Container, Row, Col, Spinner } from 'reactstrap';
 import './App.css';
 import * as d3 from 'd3';
 import { Header, SearchInput } from './components';
@@ -25,6 +25,7 @@ interface AppState {
     '5. Output Size': string;
     '6. Time Zone': string;
   };
+  fetchChart: boolean;
 }
 
 class App extends Component<{}, AppState> {
@@ -37,14 +38,22 @@ class App extends Component<{}, AppState> {
       '5. Output Size': '',
       '6. Time Zone': ''
     },
-    timeSeries: {}
+    timeSeries: {},
+    fetchChart: false
   };
   componentDidMount = async () => {
-    const { data } = await axios.get('/api/stock-info?stock=DJI');
+    this.fetchStockInfo();
+  };
+  fetchStockInfo = async (symbol = 'GOOG') => {
+    const svg = d3.select('#svg-chart');
+    if (svg) svg.remove();
+    this.setState({ fetchChart: true });
+    const { data } = await axios.get(`/api/stock-info?stock=${symbol}`);
     this.setState(
       {
         metaData: data['Meta Data'],
-        timeSeries: data['Time Series (5min)']
+        timeSeries: data['Time Series (5min)'],
+        fetchChart: false
       },
       this.createChart
     );
@@ -57,6 +66,7 @@ class App extends Component<{}, AppState> {
     var svg = d3
       .select('.svg-container')
       .append('svg')
+      .attr('id', 'svg-chart')
       .attr('width', width + margin.left + margin.right)
       .attr('height', height + margin.top + margin.bottom)
       .append('g')
@@ -239,11 +249,28 @@ class App extends Component<{}, AppState> {
   };
 
   render() {
+    const { fetchChart, metaData } = this.state;
     return (
       <div className='App'>
         <Header />
-        <SearchInput />
-        <div className='svg-container' />
+        <Container>
+          <Row className='my-4'>
+            <Col className='mx-auto' xs='4'>
+              <SearchInput fetchStockInfo={this.fetchStockInfo} />
+            </Col>
+          </Row>
+          <Row>
+            <Col xs='4'>Symbol: {metaData['2. Symbol']} </Col>
+            <Col xs='4'>Last Refreshed: {metaData['3. Last Refreshed']}</Col>
+            <Col xs='4'>Timezone: {metaData['6. Time Zone']}</Col>
+          </Row>
+          {!!fetchChart && <Spinner color='primary' />}
+          <Row className='my-4'>
+            <Col>
+              <div className='svg-container' />
+            </Col>
+          </Row>
+        </Container>
       </div>
     );
   }

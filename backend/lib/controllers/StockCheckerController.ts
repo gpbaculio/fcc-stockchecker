@@ -17,9 +17,7 @@ export default class ProjectController {
   };
   public getSymbol = async (req: Request, res: Response) => {
     const { keywords } = req.query;
-    console.log('keywords ', keywords);
     const matches = await searchSymbol(keywords);
-    console.log('matches', matches);
     res.json({ matches });
   };
 }
