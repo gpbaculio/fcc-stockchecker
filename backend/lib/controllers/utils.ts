@@ -1,6 +1,9 @@
+import Stock from '../models/Stock';
+import Voter from '../models/Voter';
+
 const axios = require('axios');
 
-export const getStockPrice = async (symbol: string) => {
+export const getStockPrice = async (symbol: string, ipAddress: string) => {
   const stockPrice = await axios
     .get(process.env.STOCK_API_BASE_URL_QUERY, {
       params: {
@@ -10,16 +13,25 @@ export const getStockPrice = async (symbol: string) => {
       }
     })
     .then(({ data: { 'Global Quote': globalQuote } }) => {
-      console.log('globalQuote ', globalQuote['05. price']);
       return globalQuote['05. price'];
     });
-  console.log('stockPrice ', stockPrice);
+  const likes = await Stock.findOne({ symbol });
+  console.log('likes ', likes);
   return {
     stock: symbol,
-    price: stockPrice
+    price: stockPrice,
+    likes: likes || 0
   };
 };
-
+// extract ip
+export const extractIp = (req, res, next) => {
+  const regexLanguageAndIPAddress = /.*?(?=,)/;
+  const ipAddress = JSON.stringify(
+    regexLanguageAndIPAddress.exec(req.headers['x-forwarded-for'])
+  ).slice(2, -2);
+  res.locals.ip = ipAddress;
+  next();
+};
 export const getStockInfo = async (symbol: string) => {
   const getCircularReplacer = () => {
     const seen = new WeakSet();

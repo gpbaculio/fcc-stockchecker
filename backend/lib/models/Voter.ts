@@ -2,6 +2,7 @@ import * as mongoose from 'mongoose';
 
 export interface VoterDocument extends mongoose.Document {
   voterIp: string;
+  stocksLiked: string[];
 }
 
 const VoterSchema = new mongoose.Schema(

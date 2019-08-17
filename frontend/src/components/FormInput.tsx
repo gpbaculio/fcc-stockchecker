@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Form, FormGroup, Label, Input, Button } from 'reactstrap';
+import Axios from 'axios';
 
 interface FormInputProps {
   symbol: string;
@@ -30,11 +31,18 @@ class FormInput extends Component<FormInputProps, FormInputState> {
       [name]: value
     });
   };
+  onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const { symbol, like } = this.state;
+    const data = await Axios.get(
+      `/api/stock-prices?stock=${symbol}&like=${like}`
+    );
+    console.log('data ', data);
+  };
   render() {
     const { like, symbol } = this.state;
-    console.log('symbol ', symbol);
     return (
-      <Form className='mx-auto' inline>
+      <Form onSubmit={this.onSubmit} className='mx-auto' inline>
         <FormGroup className='mb-2 mr-sm-2 mb-sm-0'>
           <Label for='exampleEmail' className='mr-sm-2'>
             Symbol
@@ -59,7 +67,7 @@ class FormInput extends Component<FormInputProps, FormInputState> {
             Like?
           </Label>
         </FormGroup>
-        <Button>Get Price</Button>
+        <Button type='submit'>Get Price</Button>
       </Form>
     );
   }

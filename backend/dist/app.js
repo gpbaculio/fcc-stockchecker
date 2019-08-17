@@ -40,7 +40,7 @@ class App {
         };
         this.app.use(bodyParser.json());
         this.app.use(bodyParser.urlencoded({ extended: true }));
-        this.app.set('trust proxy', 1); // trust first proxy
+        this.app.enable('trust proxy');
         sessionConfig.cookie.secure = true; // serve secure cookies
         this.app.use(session(sessionConfig));
         // this.app.use(express.static(path.join(__dirname, '../../frontend/build')));

@@ -8,8 +8,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const Stock_1 = require("../models/Stock");
 const axios = require('axios');
-exports.getStockPrice = (symbol) => __awaiter(this, void 0, void 0, function* () {
+exports.getStockPrice = (symbol, ipAddress) => __awaiter(this, void 0, void 0, function* () {
     const stockPrice = yield axios
         .get(process.env.STOCK_API_BASE_URL_QUERY, {
         params: {
@@ -19,15 +20,23 @@ exports.getStockPrice = (symbol) => __awaiter(this, void 0, void 0, function* ()
         }
     })
         .then(({ data: { 'Global Quote': globalQuote } }) => {
-        console.log('globalQuote ', globalQuote['05. price']);
         return globalQuote['05. price'];
     });
-    console.log('stockPrice ', stockPrice);
+    const likes = yield Stock_1.default.findOne({ symbol });
+    console.log('likes ', likes);
     return {
         stock: symbol,
-        price: stockPrice
+        price: stockPrice,
+        likes: likes || 0
     };
 });
+// extract ip
+exports.extractIp = (req, res, next) => {
+    const regexLanguageAndIPAddress = /.*?(?=,)/;
+    const ipAddress = JSON.stringify(regexLanguageAndIPAddress.exec(req.headers['x-forwarded-for'])).slice(2, -2);
+    res.locals.ip = ipAddress;
+    next();
+};
 exports.getStockInfo = (symbol) => __awaiter(this, void 0, void 0, function* () {
     const getCircularReplacer = () => {
         const seen = new WeakSet();

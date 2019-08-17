@@ -12,9 +12,11 @@ const utils_1 = require("./utils");
 class ProjectController {
     constructor() {
         this.getStockData = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const { stock } = req.query;
+            const { stock, like } = req.query;
+            console.log('like ', like);
+            const ipAddress = req.ip;
             if (!Array.isArray(stock)) {
-                const stockPrice = yield utils_1.getStockPrice(stock);
+                const stockPrice = yield utils_1.getStockPrice(stock, ipAddress);
                 res.json(stockPrice);
             }
         });
