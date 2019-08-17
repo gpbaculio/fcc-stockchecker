@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Input, Container, Row, Col, Spinner } from 'reactstrap';
 import './App.css';
 import * as d3 from 'd3';
-import { Header, SearchInput } from './components';
+import { Header, SearchInput, FormInput } from './components';
 
 interface tsData {
   '1. open': string;
@@ -60,8 +60,8 @@ class App extends Component<{}, AppState> {
   };
   createChart = () => {
     var margin = { top: 30, right: 50, bottom: 30, left: 50 },
-      width = 650 - margin.left - margin.right,
-      height = 470 - margin.top - margin.bottom;
+      width = 550 - margin.left - margin.right,
+      height = 270 - margin.top - margin.bottom;
     // Set the dimensions of the canvas / graph
     var svg = d3
       .select('.svg-container')
@@ -268,6 +268,11 @@ class App extends Component<{}, AppState> {
           <Row className='my-4'>
             <Col>
               <div className='svg-container' />
+            </Col>
+          </Row>
+          <Row>
+            <Col className='mx-auto d-flex justify-content-center'>
+              <FormInput symbol={metaData['2. Symbol']} />
             </Col>
           </Row>
         </Container>
