@@ -1,20 +1,33 @@
 import { Request, Response } from 'express';
 import Stock, { StockDocument } from '../models/Stock';
-import { getStockPrice, getStockInfo, searchSymbol } from './utils';
+import { getStockData, getStockInfo, searchSymbol } from './utils';
 
 export default class ProjectController {
   public getStockData = async (req: Request, res: Response) => {
     const { stock, like } = req.query;
-    const likeBool = like === 'true' ? true : false;
+    const likeBool = like && like === 'true' ? true : false;
     const ipAddress = req.ip;
-    console.log('likeBool ', likeBool);
     if (!Array.isArray(stock)) {
-      const stockPrice = await getStockPrice({
+      const stockData = await getStockData({
         symbol: stock,
         ipAddress,
         like: likeBool
       });
-      res.json(stockPrice);
+      res.json({ stockData });
+    } else {
+      const stockData = await Promise.all(
+        stock.map(async st => {
+          const stdata = await getStockData({
+            symbol: st,
+            ipAddress,
+            like: likeBool
+          });
+          return stdata;
+        })
+      );
+      res.json({
+        stockData
+      });
     }
   };
   public getStockInfo = async (req: Request, res: Response) => {

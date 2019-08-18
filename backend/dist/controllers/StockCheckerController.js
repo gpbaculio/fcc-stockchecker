@@ -13,16 +13,28 @@ class ProjectController {
     constructor() {
         this.getStockData = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { stock, like } = req.query;
-            const likeBool = like === 'true' ? true : false;
+            const likeBool = like && like === 'true' ? true : false;
             const ipAddress = req.ip;
-            console.log('likeBool ', likeBool);
             if (!Array.isArray(stock)) {
-                const stockPrice = yield utils_1.getStockPrice({
+                const stockData = yield utils_1.getStockData({
                     symbol: stock,
                     ipAddress,
                     like: likeBool
                 });
-                res.json(stockPrice);
+                res.json({ stockData });
+            }
+            else {
+                const stockData = yield Promise.all(stock.map((st) => __awaiter(this, void 0, void 0, function* () {
+                    const stdata = yield utils_1.getStockData({
+                        symbol: st,
+                        ipAddress,
+                        like: likeBool
+                    });
+                    return stdata;
+                })));
+                res.json({
+                    stockData
+                });
             }
         });
         this.getStockInfo = (req, res) => __awaiter(this, void 0, void 0, function* () {

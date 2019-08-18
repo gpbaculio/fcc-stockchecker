@@ -8,19 +8,14 @@ interface stockArgs {
   like: boolean;
 }
 
-export const saveStock = async ({ symbol, ipAddress, like }: stockArgs) => {
-  let stock = await Stock.create({
-    symbol
+export const saveStock = async symbol => {
+  const stock = await Stock.create({
+    symbol: symbol.toLowerCase()
   });
-  if (like) {
-    stock.likersIp.push(ipAddress);
-    stock.totalLikes = 1;
-    stock.save();
-  }
   return stock;
 };
 
-export const getStockPrice = async ({ symbol, ipAddress, like }: stockArgs) => {
+export const getStockData = async ({ symbol, ipAddress, like }: stockArgs) => {
   const stockPrice = await axios
     .get(process.env.STOCK_API_BASE_URL_QUERY, {
       params: {
@@ -32,14 +27,30 @@ export const getStockPrice = async ({ symbol, ipAddress, like }: stockArgs) => {
     .then(
       ({ data: { 'Global Quote': globalQuote } }) => globalQuote['05. price']
     );
-  let stock = await Stock.findOne({ symbol });
+  let stock = await Stock.findOne({ symbol: symbol.toLowerCase() });
   if (!stock) {
-    stock = await saveStock({ symbol, ipAddress, like });
+    stock = await saveStock(symbol);
   }
   if (!stock.likersIp.includes(ipAddress) && like) {
-    stock.likersIp.push(ipAddress);
-    stock.totalLikes = stock.totalLikes || 0 + 1;
-    stock.save();
+    stock = await Stock.findOneAndUpdate(
+      { symbol: symbol.toLowerCase() },
+      {
+        $set: { totalLikes: stock.totalLikes || 0 + 1 },
+        $push: { likersIp: ipAddress }
+      },
+      { new: true }
+    );
+  } else if (stock.likersIp.includes(ipAddress) && like) {
+    stock = await Stock.findOneAndUpdate(
+      { symbol: symbol.toLowerCase() },
+      {
+        $set: {
+          totalLikes: stock.totalLikes - 1,
+          likersIp: stock.likersIp.filter(iAdd => iAdd !== ipAddress)
+        }
+      },
+      { new: true }
+    );
   }
   return {
     stock: symbol,
@@ -47,15 +58,7 @@ export const getStockPrice = async ({ symbol, ipAddress, like }: stockArgs) => {
     likes: stock.totalLikes
   };
 };
-// extract ip
-export const extractIp = (req, res, next) => {
-  const regexLanguageAndIPAddress = /.*?(?=,)/;
-  const ipAddress = JSON.stringify(
-    regexLanguageAndIPAddress.exec(req.headers['x-forwarded-for'])
-  ).slice(2, -2);
-  res.locals.ip = ipAddress;
-  next();
-};
+
 export const getStockInfo = async (symbol: string) => {
   const getCircularReplacer = () => {
     const seen = new WeakSet();

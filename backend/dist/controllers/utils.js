@@ -10,18 +10,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const Stock_1 = require("../models/Stock");
 const axios = require('axios');
-exports.saveStock = ({ symbol, ipAddress, like }) => __awaiter(this, void 0, void 0, function* () {
-    let stock = yield Stock_1.default.create({
-        symbol
+exports.saveStock = (symbol) => __awaiter(this, void 0, void 0, function* () {
+    const stock = yield Stock_1.default.create({
+        symbol: symbol.toLowerCase()
     });
-    if (like) {
-        stock.likersIp.push(ipAddress);
-        stock.totalLikes = 1;
-        stock.save();
-    }
     return stock;
 });
-exports.getStockPrice = ({ symbol, ipAddress, like }) => __awaiter(this, void 0, void 0, function* () {
+exports.getStockData = ({ symbol, ipAddress, like }) => __awaiter(this, void 0, void 0, function* () {
     const stockPrice = yield axios
         .get(process.env.STOCK_API_BASE_URL_QUERY, {
         params: {
@@ -31,14 +26,23 @@ exports.getStockPrice = ({ symbol, ipAddress, like }) => __awaiter(this, void 0,
         }
     })
         .then(({ data: { 'Global Quote': globalQuote } }) => globalQuote['05. price']);
-    let stock = yield Stock_1.default.findOne({ symbol });
+    let stock = yield Stock_1.default.findOne({ symbol: symbol.toLowerCase() });
     if (!stock) {
-        stock = yield exports.saveStock({ symbol, ipAddress, like });
+        stock = yield exports.saveStock(symbol);
     }
     if (!stock.likersIp.includes(ipAddress) && like) {
-        stock.likersIp.push(ipAddress);
-        stock.totalLikes = stock.totalLikes || 0 + 1;
-        stock.save();
+        stock = yield Stock_1.default.findOneAndUpdate({ symbol: symbol.toLowerCase() }, {
+            $set: { totalLikes: stock.totalLikes || 0 + 1 },
+            $push: { likersIp: ipAddress }
+        }, { new: true });
+    }
+    else if (stock.likersIp.includes(ipAddress) && like) {
+        stock = yield Stock_1.default.findOneAndUpdate({ symbol: symbol.toLowerCase() }, {
+            $set: {
+                totalLikes: stock.totalLikes - 1,
+                likersIp: stock.likersIp.filter(iAdd => iAdd !== ipAddress)
+            }
+        }, { new: true });
     }
     return {
         stock: symbol,
@@ -46,13 +50,6 @@ exports.getStockPrice = ({ symbol, ipAddress, like }) => __awaiter(this, void 0,
         likes: stock.totalLikes
     };
 });
-// extract ip
-exports.extractIp = (req, res, next) => {
-    const regexLanguageAndIPAddress = /.*?(?=,)/;
-    const ipAddress = JSON.stringify(regexLanguageAndIPAddress.exec(req.headers['x-forwarded-for'])).slice(2, -2);
-    res.locals.ip = ipAddress;
-    next();
-};
 exports.getStockInfo = (symbol) => __awaiter(this, void 0, void 0, function* () {
     const getCircularReplacer = () => {
         const seen = new WeakSet();

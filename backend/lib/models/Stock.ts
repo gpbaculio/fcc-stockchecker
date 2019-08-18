@@ -2,7 +2,7 @@ import * as mongoose from 'mongoose';
 
 export interface StockDocument extends mongoose.Document {
   symbol: string;
-  likersIp: [string];
+  likersIp: string[];
   totalLikes: number;
 }
 
@@ -14,10 +14,12 @@ const StockSchema = new mongoose.Schema(
     },
     likersIp: {
       type: [String],
-      required: false
+      required: false,
+      default: []
     },
     totalLikes: {
       type: Number,
+      default: 0,
       required: false
     }
   },
