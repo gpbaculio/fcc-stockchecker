@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import Stock, { StockDocument } from '../models/Stock';
 import { getStockData, getStockInfo, searchSymbol } from './utils';
 
 export default class ProjectController {

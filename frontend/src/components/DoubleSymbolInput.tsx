@@ -2,25 +2,35 @@ import React, { Component } from 'react';
 import { Form, FormGroup, Label, Input, Button } from 'reactstrap';
 import Axios from 'axios';
 
-interface FormInputProps {
+interface DoubleSymbolInputProps {
   symbol: string;
 }
-interface FormInputState {
+
+interface DoubleSymbolInputState {
   like: boolean;
-  symbol: string;
+  firstSymbol: string;
+  secondSymbol: string;
   [text: string]: string | boolean;
 }
-class FormInput extends Component<FormInputProps, FormInputState> {
-  constructor(props: FormInputProps) {
+
+class DoubleSymbolInput extends Component<
+  DoubleSymbolInputProps,
+  DoubleSymbolInputState
+> {
+  constructor(props: DoubleSymbolInputProps) {
     super(props);
     this.state = {
       like: false,
-      symbol: props.symbol
+      firstSymbol: props.symbol,
+      secondSymbol: 'MSFT'
     };
   }
-  componentDidUpdate(prevProps: FormInputProps, prevState: FormInputState) {
+  componentDidUpdate(
+    prevProps: DoubleSymbolInputProps,
+    _prevState: DoubleSymbolInputState
+  ) {
     if (prevProps.symbol !== this.props.symbol) {
-      this.setState({ symbol: this.props.symbol });
+      this.setState({ firstSymbol: this.props.symbol });
     }
   }
   handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,27 +43,34 @@ class FormInput extends Component<FormInputProps, FormInputState> {
   };
   onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const { symbol, like } = this.state;
+    const { firstSymbol, secondSymbol, like } = this.state;
     const data = await Axios.get(
-      `/api/stock-prices?stock=${symbol}&like=${like}`
+      `/api/stock-prices?stock=${firstSymbol}&stock=${secondSymbol}&like=${like}`
     );
     console.log('data ', data);
   };
   render() {
-    const { like, symbol } = this.state;
+    const { like, firstSymbol, secondSymbol } = this.state;
     return (
       <Form onSubmit={this.onSubmit} className='mx-auto' inline>
         <FormGroup className='mb-2 mr-sm-2 mb-sm-0'>
-          <Label for='exampleEmail' className='mr-sm-2'>
-            Symbol
-          </Label>
           <Input
             onChange={this.handleInputChange}
-            value={symbol}
+            value={firstSymbol}
             type='text'
-            name='symbol'
-            id='stockText'
-            placeholder='Stock Symbol'
+            name='firstSymbol'
+            id='firstSymbol'
+            placeholder='First Stock Symbol'
+          />
+        </FormGroup>
+        <FormGroup className='mb-2 mr-sm-2 mb-sm-0'>
+          <Input
+            onChange={this.handleInputChange}
+            value={secondSymbol}
+            type='text'
+            name='secondSymbol'
+            id='secondSymbol'
+            placeholder='Second Stock Symbol'
           />
         </FormGroup>
         <FormGroup check className='mb-2 mr-sm-2 mb-sm-0'>
@@ -73,4 +90,4 @@ class FormInput extends Component<FormInputProps, FormInputState> {
   }
 }
 
-export default FormInput;
+export default DoubleSymbolInput;

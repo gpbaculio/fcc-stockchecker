@@ -1,9 +1,14 @@
 import React, { Component } from 'react';
-import axios from 'axios';
-import { Input, Container, Row, Col, Spinner } from 'reactstrap';
-import './App.css';
 import * as d3 from 'd3';
-import { Header, SearchInput, FormInput } from './components';
+import axios from 'axios';
+import { Container, Row, Col, Spinner } from 'reactstrap';
+import './App.css';
+import {
+  Header,
+  SearchInput,
+  SingleSymbolInput,
+  DoubleSymbolInput
+} from './components';
 
 interface tsData {
   '1. open': string;
@@ -271,8 +276,15 @@ class App extends Component<{}, AppState> {
             </Col>
           </Row>
           <Row>
-            <Col className='mx-auto d-flex justify-content-center'>
-              <FormInput symbol={metaData['2. Symbol']} />
+            <Col className='mx-auto d-flex flex-column justify-content-center'>
+              <h5 className='my-3'>Get single price and total likes</h5>
+              <SingleSymbolInput symbol={metaData['2. Symbol']} />
+            </Col>
+          </Row>
+          <Row>
+            <Col className='mx-auto d-flex flex-column justify-content-center'>
+              <h5 className='my-3'>Compare and get relative likes</h5>
+              <DoubleSymbolInput symbol={metaData['2. Symbol']} />
             </Col>
           </Row>
         </Container>
