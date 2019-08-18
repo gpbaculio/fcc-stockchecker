@@ -6,6 +6,8 @@ interface stockArgs {
   symbol: string;
   ipAddress: string;
   like: boolean;
+  type: 'single' | 'double';
+  secondSymbol?: string;
 }
 
 export const saveStock = async symbol => {
@@ -15,7 +17,37 @@ export const saveStock = async symbol => {
   return stock;
 };
 
-export const getStockData = async ({ symbol, ipAddress, like }: stockArgs) => {
+export const pushIpAndLike = (symbol, totalLikes, ipAddress) => {
+  return Stock.findOneAndUpdate(
+    { symbol: symbol.toLowerCase() },
+    {
+      $set: { totalLikes: totalLikes + 1 },
+      $push: { likersIp: ipAddress }
+    },
+    { new: true }
+  );
+};
+
+export const filterIpAndUnlike = (symbol, totalLikes, likersIp, ipAddress) => {
+  return Stock.findOneAndUpdate(
+    { symbol: symbol.toLowerCase() },
+    {
+      $set: {
+        totalLikes: totalLikes - 1,
+        likersIp: likersIp.filter(iAdd => iAdd !== ipAddress)
+      }
+    },
+    { new: true }
+  );
+};
+
+export const getStockData = async ({
+  symbol,
+  ipAddress,
+  like,
+  type,
+  secondSymbol
+}: stockArgs) => {
   const stockPrice = await axios
     .get(process.env.STOCK_API_BASE_URL_QUERY, {
       params: {
@@ -32,31 +64,48 @@ export const getStockData = async ({ symbol, ipAddress, like }: stockArgs) => {
     stock = await saveStock(symbol);
   }
   if (!stock.likersIp.includes(ipAddress) && like) {
-    stock = await Stock.findOneAndUpdate(
-      { symbol: symbol.toLowerCase() },
-      {
-        $set: { totalLikes: stock.totalLikes || 0 + 1 },
-        $push: { likersIp: ipAddress }
-      },
-      { new: true }
-    );
+    stock = await pushIpAndLike(symbol, stock.totalLikes, ipAddress);
   } else if (stock.likersIp.includes(ipAddress) && like) {
-    stock = await Stock.findOneAndUpdate(
-      { symbol: symbol.toLowerCase() },
-      {
-        $set: {
-          totalLikes: stock.totalLikes - 1,
-          likersIp: stock.likersIp.filter(iAdd => iAdd !== ipAddress)
-        }
-      },
-      { new: true }
+    stock = await filterIpAndUnlike(
+      symbol,
+      stock.totalLikes,
+      stock.likersIp,
+      ipAddress
     );
   }
-  return {
-    stock: symbol,
-    price: stockPrice,
-    likes: stock.totalLikes
-  };
+  if (type === 'single')
+    return {
+      stock: symbol,
+      price: stockPrice,
+      likes: stock.totalLikes
+    };
+  if (type === 'double') {
+    let secondStock = await Stock.findOne({
+      symbol: secondSymbol.toLowerCase()
+    });
+    if (!secondStock) {
+      secondStock = await saveStock(symbol);
+    }
+    if (!secondStock.likersIp.includes(ipAddress) && like) {
+      secondStock = await pushIpAndLike(
+        symbol,
+        secondStock.totalLikes,
+        ipAddress
+      );
+    } else if (secondStock.likersIp.includes(ipAddress) && like) {
+      secondStock = await filterIpAndUnlike(
+        symbol,
+        secondStock.totalLikes,
+        secondStock.likersIp,
+        ipAddress
+      );
+    }
+    return {
+      stock: symbol,
+      price: stockPrice,
+      rel_likes: stock.totalLikes - secondStock.totalLikes
+    };
+  }
 };
 
 export const getStockInfo = async (symbol: string) => {

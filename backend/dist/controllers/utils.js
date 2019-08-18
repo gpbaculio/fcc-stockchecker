@@ -16,7 +16,21 @@ exports.saveStock = (symbol) => __awaiter(this, void 0, void 0, function* () {
     });
     return stock;
 });
-exports.getStockData = ({ symbol, ipAddress, like }) => __awaiter(this, void 0, void 0, function* () {
+exports.pushIpAndLike = (symbol, totalLikes, ipAddress) => {
+    return Stock_1.default.findOneAndUpdate({ symbol: symbol.toLowerCase() }, {
+        $set: { totalLikes: totalLikes + 1 },
+        $push: { likersIp: ipAddress }
+    }, { new: true });
+};
+exports.filterIpAndUnlike = (symbol, totalLikes, likersIp, ipAddress) => {
+    return Stock_1.default.findOneAndUpdate({ symbol: symbol.toLowerCase() }, {
+        $set: {
+            totalLikes: totalLikes - 1,
+            likersIp: likersIp.filter(iAdd => iAdd !== ipAddress)
+        }
+    }, { new: true });
+};
+exports.getStockData = ({ symbol, ipAddress, like, type, secondSymbol }) => __awaiter(this, void 0, void 0, function* () {
     const stockPrice = yield axios
         .get(process.env.STOCK_API_BASE_URL_QUERY, {
         params: {
@@ -31,24 +45,36 @@ exports.getStockData = ({ symbol, ipAddress, like }) => __awaiter(this, void 0, 
         stock = yield exports.saveStock(symbol);
     }
     if (!stock.likersIp.includes(ipAddress) && like) {
-        stock = yield Stock_1.default.findOneAndUpdate({ symbol: symbol.toLowerCase() }, {
-            $set: { totalLikes: stock.totalLikes || 0 + 1 },
-            $push: { likersIp: ipAddress }
-        }, { new: true });
+        stock = yield exports.pushIpAndLike(symbol, stock.totalLikes, ipAddress);
     }
     else if (stock.likersIp.includes(ipAddress) && like) {
-        stock = yield Stock_1.default.findOneAndUpdate({ symbol: symbol.toLowerCase() }, {
-            $set: {
-                totalLikes: stock.totalLikes - 1,
-                likersIp: stock.likersIp.filter(iAdd => iAdd !== ipAddress)
-            }
-        }, { new: true });
+        stock = yield exports.filterIpAndUnlike(symbol, stock.totalLikes, stock.likersIp, ipAddress);
     }
-    return {
-        stock: symbol,
-        price: stockPrice,
-        likes: stock.totalLikes
-    };
+    if (type === 'single')
+        return {
+            stock: symbol,
+            price: stockPrice,
+            likes: stock.totalLikes
+        };
+    if (type === 'double') {
+        let secondStock = yield Stock_1.default.findOne({
+            symbol: secondSymbol.toLowerCase()
+        });
+        if (!secondStock) {
+            secondStock = yield exports.saveStock(symbol);
+        }
+        if (!secondStock.likersIp.includes(ipAddress) && like) {
+            secondStock = yield exports.pushIpAndLike(symbol, secondStock.totalLikes, ipAddress);
+        }
+        else if (secondStock.likersIp.includes(ipAddress) && like) {
+            secondStock = yield exports.filterIpAndUnlike(symbol, secondStock.totalLikes, secondStock.likersIp, ipAddress);
+        }
+        return {
+            stock: symbol,
+            price: stockPrice,
+            rel_likes: stock.totalLikes - secondStock.totalLikes
+        };
+    }
 });
 exports.getStockInfo = (symbol) => __awaiter(this, void 0, void 0, function* () {
     const getCircularReplacer = () => {

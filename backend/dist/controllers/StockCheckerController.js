@@ -19,22 +19,31 @@ class ProjectController {
                 const stockData = yield utils_1.getStockData({
                     symbol: stock,
                     ipAddress,
-                    like: likeBool
+                    like: likeBool,
+                    type: 'single'
                 });
+                console.log('stockData single ', stockData);
                 res.json({ stockData });
             }
             else {
-                const stockData = yield Promise.all(stock.map((st) => __awaiter(this, void 0, void 0, function* () {
-                    const stdata = yield utils_1.getStockData({
-                        symbol: st,
-                        ipAddress,
-                        like: likeBool
-                    });
-                    return stdata;
-                })));
-                res.json({
-                    stockData
+                let [firstSymBol, secondSymbol] = stock;
+                firstSymBol = yield utils_1.getStockData({
+                    symbol: firstSymBol,
+                    ipAddress,
+                    like: likeBool,
+                    type: 'double',
+                    secondSymbol
                 });
+                secondSymbol = yield utils_1.getStockData({
+                    symbol: secondSymbol,
+                    ipAddress,
+                    like: likeBool,
+                    type: 'double',
+                    secondSymbol: firstSymBol.stock
+                });
+                const stockData = [firstSymBol, secondSymbol];
+                console.log('stockData double ', stockData);
+                res.json({ stockData });
             }
         });
         this.getStockInfo = (req, res) => __awaiter(this, void 0, void 0, function* () {

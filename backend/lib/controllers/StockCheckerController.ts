@@ -10,23 +10,30 @@ export default class ProjectController {
       const stockData = await getStockData({
         symbol: stock,
         ipAddress,
-        like: likeBool
+        like: likeBool,
+        type: 'single'
       });
+      console.log('stockData single ', stockData);
       res.json({ stockData });
     } else {
-      const stockData = await Promise.all(
-        stock.map(async st => {
-          const stdata = await getStockData({
-            symbol: st,
-            ipAddress,
-            like: likeBool
-          });
-          return stdata;
-        })
-      );
-      res.json({
-        stockData
+      let [firstSymBol, secondSymbol] = stock;
+      firstSymBol = await getStockData({
+        symbol: firstSymBol,
+        ipAddress,
+        like: likeBool,
+        type: 'double',
+        secondSymbol
       });
+      secondSymbol = await getStockData({
+        symbol: secondSymbol,
+        ipAddress,
+        like: likeBool,
+        type: 'double',
+        secondSymbol: firstSymBol.stock
+      });
+      const stockData = [firstSymBol, secondSymbol];
+      console.log('stockData double ', stockData);
+      res.json({ stockData });
     }
   };
   public getStockInfo = async (req: Request, res: Response) => {
