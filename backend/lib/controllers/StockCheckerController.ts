@@ -5,10 +5,15 @@ import { getStockPrice, getStockInfo, searchSymbol } from './utils';
 export default class ProjectController {
   public getStockData = async (req: Request, res: Response) => {
     const { stock, like } = req.query;
-    console.log('like ', like);
+    const likeBool = like === 'true' ? true : false;
     const ipAddress = req.ip;
+    console.log('likeBool ', likeBool);
     if (!Array.isArray(stock)) {
-      const stockPrice = await getStockPrice(stock, ipAddress);
+      const stockPrice = await getStockPrice({
+        symbol: stock,
+        ipAddress,
+        like: likeBool
+      });
       res.json(stockPrice);
     }
   };

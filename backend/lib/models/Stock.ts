@@ -2,7 +2,8 @@ import * as mongoose from 'mongoose';
 
 export interface StockDocument extends mongoose.Document {
   symbol: string;
-  likes: Number;
+  likersIp: [string];
+  totalLikes: number;
 }
 
 const StockSchema = new mongoose.Schema(
@@ -11,9 +12,13 @@ const StockSchema = new mongoose.Schema(
       type: String,
       required: true
     },
-    likes: {
+    likersIp: {
+      type: [String],
+      required: false
+    },
+    totalLikes: {
       type: Number,
-      required: true
+      required: false
     }
   },
   {

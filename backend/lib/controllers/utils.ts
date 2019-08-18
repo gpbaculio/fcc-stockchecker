@@ -1,9 +1,26 @@
 import Stock from '../models/Stock';
-import Voter from '../models/Voter';
 
 const axios = require('axios');
 
-export const getStockPrice = async (symbol: string, ipAddress: string) => {
+interface stockArgs {
+  symbol: string;
+  ipAddress: string;
+  like: boolean;
+}
+
+export const saveStock = async ({ symbol, ipAddress, like }: stockArgs) => {
+  let stock = await Stock.create({
+    symbol
+  });
+  if (like) {
+    stock.likersIp.push(ipAddress);
+    stock.totalLikes = 1;
+    stock.save();
+  }
+  return stock;
+};
+
+export const getStockPrice = async ({ symbol, ipAddress, like }: stockArgs) => {
   const stockPrice = await axios
     .get(process.env.STOCK_API_BASE_URL_QUERY, {
       params: {
@@ -12,15 +29,22 @@ export const getStockPrice = async (symbol: string, ipAddress: string) => {
         apikey: process.env.STOCK_API_KEY
       }
     })
-    .then(({ data: { 'Global Quote': globalQuote } }) => {
-      return globalQuote['05. price'];
-    });
-  const likes = await Stock.findOne({ symbol });
-  console.log('likes ', likes);
+    .then(
+      ({ data: { 'Global Quote': globalQuote } }) => globalQuote['05. price']
+    );
+  let stock = await Stock.findOne({ symbol });
+  if (!stock) {
+    stock = await saveStock({ symbol, ipAddress, like });
+  }
+  if (!stock.likersIp.includes(ipAddress) && like) {
+    stock.likersIp.push(ipAddress);
+    stock.totalLikes = stock.totalLikes || 0 + 1;
+    stock.save();
+  }
   return {
     stock: symbol,
     price: stockPrice,
-    likes: likes || 0
+    likes: stock.totalLikes
   };
 };
 // extract ip

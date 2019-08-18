@@ -6,9 +6,13 @@ const StockSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    likes: {
+    likersIp: {
+        type: [String],
+        required: false
+    },
+    totalLikes: {
         type: Number,
-        required: true
+        required: false
     }
 }, {
     timestamps: true,

@@ -25,6 +25,7 @@ class App {
             });
             mongoose.set('useFindAndModify', false);
         };
+        this.app.use(bodyParser.json());
         this.app.use(cors({ optionSuccessStatus: 200, origin: '*' }));
         this.mongoSetup();
         this.app.use(helmet());
@@ -38,7 +39,6 @@ class App {
             resave: true,
             saveUninitialized: true
         };
-        this.app.use(bodyParser.json());
         this.app.use(bodyParser.urlencoded({ extended: true }));
         this.app.enable('trust proxy');
         sessionConfig.cookie.secure = true; // serve secure cookies

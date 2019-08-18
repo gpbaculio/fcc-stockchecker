@@ -10,7 +10,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const Stock_1 = require("../models/Stock");
 const axios = require('axios');
-exports.getStockPrice = (symbol, ipAddress) => __awaiter(this, void 0, void 0, function* () {
+exports.saveStock = ({ symbol, ipAddress, like }) => __awaiter(this, void 0, void 0, function* () {
+    let stock = yield Stock_1.default.create({
+        symbol
+    });
+    if (like) {
+        stock.likersIp.push(ipAddress);
+        stock.totalLikes = 1;
+        stock.save();
+    }
+    return stock;
+});
+exports.getStockPrice = ({ symbol, ipAddress, like }) => __awaiter(this, void 0, void 0, function* () {
     const stockPrice = yield axios
         .get(process.env.STOCK_API_BASE_URL_QUERY, {
         params: {
@@ -19,15 +30,20 @@ exports.getStockPrice = (symbol, ipAddress) => __awaiter(this, void 0, void 0, f
             apikey: process.env.STOCK_API_KEY
         }
     })
-        .then(({ data: { 'Global Quote': globalQuote } }) => {
-        return globalQuote['05. price'];
-    });
-    const likes = yield Stock_1.default.findOne({ symbol });
-    console.log('likes ', likes);
+        .then(({ data: { 'Global Quote': globalQuote } }) => globalQuote['05. price']);
+    let stock = yield Stock_1.default.findOne({ symbol });
+    if (!stock) {
+        stock = yield exports.saveStock({ symbol, ipAddress, like });
+    }
+    if (!stock.likersIp.includes(ipAddress) && like) {
+        stock.likersIp.push(ipAddress);
+        stock.totalLikes = stock.totalLikes || 0 + 1;
+        stock.save();
+    }
     return {
         stock: symbol,
         price: stockPrice,
-        likes: likes || 0
+        likes: stock.totalLikes
     };
 });
 // extract ip
