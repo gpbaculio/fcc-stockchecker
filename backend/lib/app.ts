@@ -54,22 +54,22 @@ class App {
     sessionConfig.cookie.secure = true; // serve secure cookies
 
     this.app.use(session(sessionConfig));
+
+    this.fccTestingRoute.routes(this.app);
+    this.stockCheckerRoute.routes(this.app);
+    //404 Not Found Middleware
+    this.app.use((_req, res, _next) => {
+      res
+        .status(404)
+        .type('text')
+        .send('Not Found');
+    });
     // Serve any static files
     this.app.use(express.static(path.join(__dirname, '../../frontend/build')));
     // Handle React routing, return all requests to React app
     this.app.get('/*', (_req, res) =>
       res.sendFile(path.join(__dirname, '../../frontend/build', 'index.html'))
     );
-
-    this.fccTestingRoute.routes(this.app);
-    this.stockCheckerRoute.routes(this.app);
-    //404 Not Found Middleware
-    this.app.use((req, res, next) => {
-      res
-        .status(404)
-        .type('text')
-        .send('Not Found');
-    });
   }
 }
 
