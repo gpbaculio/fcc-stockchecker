@@ -57,13 +57,6 @@ class App {
 
     this.fccTestingRoute.routes(this.app);
     this.stockCheckerRoute.routes(this.app);
-    //404 Not Found Middleware
-    this.app.use((_req, res, _next) => {
-      res
-        .status(404)
-        .type('text')
-        .send('Not Found');
-    });
     // Serve any static files
     const staticPath = path.join(__dirname, '..', '..', 'frontend', 'build');
     const publicPath = path.join(
@@ -76,6 +69,13 @@ class App {
     );
     this.app.use(express.static(staticPath));
     this.app.get('/*', (_req, res) => res.sendFile(publicPath));
+    //404 Not Found Middleware
+    this.app.use((_req, res, _next) => {
+      res
+        .status(404)
+        .type('text')
+        .send('Not Found');
+    });
   }
 }
 
