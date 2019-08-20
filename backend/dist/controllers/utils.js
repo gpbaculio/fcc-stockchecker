@@ -39,7 +39,7 @@ exports.getStockData = ({ symbol, ipAddress, like, type, secondSymbol }) => __aw
             apikey: process.env.STOCK_API_KEY
         }
     })
-        .then(({ data: { 'Global Quote': globalQuote } }) => globalQuote['05. price']);
+        .then(({ data: { 'Global Quote': globalQuote } }) => Number(globalQuote['05. price']));
     let stock = yield Stock_1.default.findOne({ symbol: symbol.toLowerCase() });
     if (!stock) {
         stock = yield exports.saveStock(symbol);

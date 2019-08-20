@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon ./dist/server.js",
-    "start": "node ./dist/server.js",
+    "start": "nodemon ./dist/server.js",
     "prod": "npm run build && npm run start"
   },
   "keywords": [],

@@ -43,15 +43,15 @@ class App {
         this.app.enable('trust proxy');
         sessionConfig.cookie.secure = true; // serve secure cookies
         this.app.use(session(sessionConfig));
-        // this.app.use(express.static(path.join(__dirname, '../../frontend/build')));
-        // // Handle React routing, return all requests to React app
-        // this.app.get('/*', (_req, res) => {
-        //   res.sendFile(path.join(__dirname, '../../frontend/build', 'index.html'));
-        // });
         this.fccTestingRoute.routes(this.app);
         this.stockCheckerRoute.routes(this.app);
+        // Serve any static files
+        const staticPath = path.join(__dirname, '..', '..', 'frontend', 'build');
+        const publicPath = path.join(__dirname, '..', '..', 'frontend', 'build', 'index.html');
+        this.app.use(express.static(staticPath));
+        this.app.get('/*', (_req, res) => res.sendFile(publicPath));
         //404 Not Found Middleware
-        this.app.use((req, res, next) => {
+        this.app.use((_req, res, _next) => {
             res
                 .status(404)
                 .type('text')

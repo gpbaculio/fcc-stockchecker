@@ -22,7 +22,6 @@ class ProjectController {
                     like: likeBool,
                     type: 'single'
                 });
-                console.log('stockData single ', stockData);
                 res.json({ stockData });
             }
             else {
@@ -42,7 +41,6 @@ class ProjectController {
                     secondSymbol: firstSymBol.stock
                 });
                 const stockData = [firstSymBol, secondSymbol];
-                console.log('stockData double ', stockData);
                 res.json({ stockData });
             }
         });

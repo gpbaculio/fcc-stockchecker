@@ -56,8 +56,8 @@ export const getStockData = async ({
         apikey: process.env.STOCK_API_KEY
       }
     })
-    .then(
-      ({ data: { 'Global Quote': globalQuote } }) => globalQuote['05. price']
+    .then(({ data: { 'Global Quote': globalQuote } }) =>
+      Number(globalQuote['05. price'])
     );
   let stock = await Stock.findOne({ symbol: symbol.toLowerCase() });
   if (!stock) {

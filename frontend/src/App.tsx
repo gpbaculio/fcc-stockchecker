@@ -107,7 +107,8 @@ class App extends Component<{}, AppState> {
       Number(timesData[td]['4. close'])
     );
 
-    const closeMax = Math.round((d3.max(closePrices) as number) / 100) * 100;
+    const closeMax =
+      Math.round((d3.max(closePrices) as number) / 100) * 100 + 100;
     const closeMin =
       Math.round((d3.min(closePrices) as number) / 100) * 100 - 100;
 
